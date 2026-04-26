@@ -182,16 +182,35 @@ rm -rf tmp
 
 echo ">>> 冲突插件清理完成。"
 
-# rm -rf feeds/luci/applications/luci-app-quickstart
-# rm -rf feeds/packages/utils/luci-app-partexp
+# =========================================================
+# 5. 修复 iStore 简体中文语言包缺失问题
+# =========================================================
+echo ">>> 添加 iStore 语言包开机修复脚本..."
+mkdir -p package/base-files/files/etc/uci-defaults
+cat << 'EOF' > package/base-files/files/etc/uci-defaults/99-fix-istore-i18n
+#!/bin/sh
+
+I18N_DIR="/usr/lib/lua/luci/i18n"
+
+# 检查是否存在简体中文包
+if [ ! -f "$I18N_DIR/iStore.zh-cn.lmo" ]; then
+    # 如果不存在，且存在繁体中文包，则复制并重命名
+    if [ -f "$I18N_DIR/iStore.zh-tw.lmo" ]; then
+        cp -f "$I18N_DIR/iStore.zh-tw.lmo" "$I18N_DIR/iStore.zh-cn.lmo"
+    fi
+fi
+
+exit 0
+EOF
+chmod +x package/base-files/files/etc/uci-defaults/99-fix-istore-i18n
 
 # 移除 default-settings 中的 UPnP
-#find package/feeds -type f | xargs sed -i -e '/luci-app-upnp/d' -e '/luci-i18n-upnp/d' -e '/miniupnpd/d'
+
 find package/feeds -type f | xargs -r sed -i -e '/luci-app-upnp/d' -e '/luci-i18n-upnp/d' -e '/miniupnpd/d'
 sed -i '/luci-app-upnp/d' package/Makefile
 sed -i '/luci-i18n-upnp/d' package/Makefile
 sed -i '/miniupnpd/d' package/Makefile
-#rm -f tmp/.package_install
+
 
 # 修复 default-settings 问题
 echo ">>> Purge default-settings (all variants)"

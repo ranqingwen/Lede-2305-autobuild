@@ -13,11 +13,11 @@
 echo "开始 DIY2 配置……"
 echo "========================="
 # 修改主机名字，修改你喜欢的就行（不能纯数字或者使用中文）
-sed -i "/uci commit system/i\uci set system.@system[0].hostname='OpenWrt'" package/lean/default-settings/files/zzz-default-settings
-sed -i "s/hostname='.*'/hostname='OpenWrt'/g" ./package/base-files/files/bin/config_generate
+sed -i "/uci commit system/i\uci set system.@system[0].hostname='Lede'" package/lean/default-settings/files/zzz-default-settings
+sed -i "s/hostname='.*'/hostname='Lede'/g" ./package/base-files/files/bin/config_generate
 
 # 默认地址
-sed -i 's/192.168.1.1/192.168.23.250/g' package/base-files/files/bin/config_generate
+sed -i 's/192.168.1.1/192.168.23.254/g' package/base-files/files/bin/config_generate
 
 # 最大连接数修改为65535
 sed -i '/customized in this file/a net.netfilter.nf_conntrack_max=65535' package/base-files/files/etc/sysctl.conf
@@ -201,7 +201,7 @@ rm -rf package/default-settings*
 mkdir -p package/base-files/files/etc/uci-defaults
 cat << 'EOF' > package/base-files/files/etc/uci-defaults/99-system
 #!/bin/sh
-uci set system.@system[0].hostname='OpenWrt'
+uci set system.@system[0].hostname='Lede'
 uci set system.@system[0].zonename='Asia/Shanghai'
 uci set system.@system[0].timezone='CST-8'
 uci -q delete system.ntp.server

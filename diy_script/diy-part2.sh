@@ -116,7 +116,7 @@ cp -f $GITHUB_WORKSPACE/personal/argon/footer.htm $ARGON_DIR/footer.htm
 # 你的 footer.htm 默认读取 <%= ver.distversion %>
 # 但你在 version.lua 中将自定义名称赋值给了 luciversion
 # 必须执行下面这一行，右下角才会真正显示你定义的 "${build_name}"
-sed -i 's|<%= ver.distversion %>|<%= ver.luciversion %>|g' $ARGON_DIR/footer.htm
+# sed -i 's|<%= ver.distversion %>|<%= ver.luciversion %>|g' $ARGON_DIR/footer.htm
 
 # 修改欢迎banner
 cp -f $GITHUB_WORKSPACE/personal/banner package/base-files/files/etc/banner

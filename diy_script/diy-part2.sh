@@ -42,6 +42,11 @@ sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/*/Make
 # 更改argon主题背景
 cp -f $GITHUB_WORKSPACE/personal/bg1.jpg package/luci-theme-argon/htdocs/luci-static/argon/img/bg1.jpg
 
+# =========================================================
+# 修复 argon-config 报错 data[2].map is not a function
+# =========================================================
+echo ">>> 创建 Argon 主题 background 空文件夹防止 JS 报错..."
+mkdir -p package/luci-theme-argon/htdocs/luci-static/argon/background
 
 # =========================================================
 # 1. 统一变量定义
@@ -56,16 +61,14 @@ lean_r_ver=$(grep -oE "R[0-9]{2}\.[0-9]{2}\.[0-9]{2}" package/lean/default-setti
 # =========================================================
 # 2. 彻底解决显示后缀
 # =========================================================
-
-
-# 【B. 修复系统描述 (前缀)】
+# 【修复系统描述 (前缀)】
 # 保证前半截显示为：Lede by ranqw R2026.04.23 @OpenWrt R26.02.20
 custom_description="Lede by ranqw R${build_date} @OpenWrt ${lean_r_ver}"
 sed -i "s/DISTRIB_DESCRIPTION='.*'/DISTRIB_DESCRIPTION='${custom_description}'/g" package/lean/default-settings/files/zzz-default-settings
 # 将系统自带的 REVISION 置空，防止系统在后面画蛇添足再拼一个 R26.02.20
 sed -i "s/DISTRIB_REVISION='.*'/DISTRIB_REVISION=''/g" package/lean/default-settings/files/zzz-default-settings
 
-# 【C. 终极截断：开机物理覆盖】
+# 【终极截断：开机物理覆盖】
 # 源码 Make 机制太过霸道，会导致源文件在打包阶段被还原。
 # 利用 uci-defaults 在系统开机挂载可写分区后，强行整件覆写。
 mkdir -p package/base-files/files/etc/uci-defaults
@@ -111,12 +114,6 @@ mkdir -p $ARGON_DIR
 
 # 强行覆盖 footer.htm
 cp -f $GITHUB_WORKSPACE/personal/argon/footer.htm $ARGON_DIR/footer.htm
-
-# 核心逻辑对齐：
-# 你的 footer.htm 默认读取 <%= ver.distversion %>
-# 但你在 version.lua 中将自定义名称赋值给了 luciversion
-# 必须执行下面这一行，右下角才会真正显示你定义的 "${build_name}"
-# sed -i 's|<%= ver.distversion %>|<%= ver.luciversion %>|g' $ARGON_DIR/footer.htm
 
 # 修改欢迎banner
 cp -f $GITHUB_WORKSPACE/personal/banner package/base-files/files/etc/banner

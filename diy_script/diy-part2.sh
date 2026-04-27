@@ -88,22 +88,13 @@ EOF
 chmod +x package/base-files/files/etc/uci-defaults/99-fix-luci-version
 
 # =========================================================
-# 3. Argon 主题页脚动态渲染 (保持你之前的逻辑不变)
+# Argon 主题页脚动态渲染 (保持你之前的逻辑不变)
 # =========================================================
 #cp -f $GITHUB_WORKSPACE/personal/argon/footer.ut package/luci-theme-argon/ucode/template/themes/argon/footer.ut
 #cp -f $GITHUB_WORKSPACE/personal/argon/footer_login.ut package/luci-theme-argon/ucode/template/themes/argon/footer_login.ut
 
-#sed -i "s|\${build_name}|${build_name}|g" package/luci-theme-argon/ucode/template/themes/argon/footer.ut
-#sed -i "s|\${build_date}|${build_date}|g" package/luci-theme-argon/ucode/template/themes/argon/footer.ut
-#sed -i "s|\${lean_r_ver}|${lean_r_ver}|g" package/luci-theme-argon/ucode/template/themes/argon/footer.ut
-
-#sed -i "s|\${build_name}|${build_name}|g" package/luci-theme-argon/ucode/template/themes/argon/footer_login.ut
-#sed -i "s|\${build_date}|${build_date}|g" package/luci-theme-argon/ucode/template/themes/argon/footer_login.ut
-#sed -i "s|\${lean_r_ver}|${lean_r_ver}|g" package/luci-theme-argon/ucode/template/themes/argon/footer_login.ut
-
-
 # =========================================================
-# 2. 强制替换 Argon 主题页脚 (Lua 架构路径校准)
+# 强制替换 Argon 主题页脚 (Lua 架构路径校准)
 # =========================================================
 
 # 你的源码路径确认是：package/luci-theme-argon/luasrc/view/themes/argon/

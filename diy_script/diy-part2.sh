@@ -109,17 +109,23 @@ cp -f $GITHUB_WORKSPACE/personal/argon/footer.htm $ARGON_DIR/footer.htm
 # 修改欢迎banner
 cp -f $GITHUB_WORKSPACE/personal/banner package/base-files/files/etc/banner
 
-# 修复 netdata 不会自动启动的问题
+# =========================================================
+# 修复 netdata 不会自动启动和缺失 init.d 脚本的问题
+# =========================================================
 echo ">>> Fix netdata init.d & enable service"
-if [ -f /etc/init.d/netdata ]; then
-  echo "netdata init script exists"
+
+# 1. 强行将启动脚本从插件源码复制到 base-files 中，确保它一定会被打包进固件
+# 注意：你在 diy-part1.sh 中克隆到了 package/luci-app-netdata
+mkdir -p package/base-files/files/etc/init.d
+if [ -f package/luci-app-netdata/root/etc/init.d/netdata ]; then
+  cp -f package/luci-app-netdata/root/etc/init.d/netdata package/base-files/files/etc/init.d/netdata
+  chmod +x package/base-files/files/etc/init.d/netdata
+  echo "成功将 netdata 启动脚本注入到 base-files"
 else
-  if [ -f package/luci-app-netdata/root/etc/init.d/netdata ]; then
-    chmod +x package/luci-app-netdata/root/etc/init.d/netdata
-  fi
+  echo "警告: 未能在插件源码目录找到 netdata 启动脚本，请检查 diy-part1.sh 的克隆路径"
 fi
-mkdir -p package/base-files/files/etc/rc.d
-ln -sf ../init.d/netdata package/base-files/files/etc/rc.d/S99netdata
+
+# 2. 预置 netdata 配置文件
 mkdir -p package/base-files/files/etc/netdata
 cat << 'EOF' > package/base-files/files/etc/netdata/netdata.conf
 [global]
@@ -128,9 +134,12 @@ cat << 'EOF' > package/base-files/files/etc/netdata/netdata.conf
 [cloud]
     enabled = no
 EOF
+
+# 3. 改进 uci-defaults 脚本，确保在真实环境下（路由器开机后）执行注册
 mkdir -p package/base-files/files/etc/uci-defaults
 cat << 'EOF' > package/base-files/files/etc/uci-defaults/99-netdata
 #!/bin/sh
+# 检查脚本是否存在并具备执行权限
 if [ -x /etc/init.d/netdata ]; then
   /etc/init.d/netdata enable
   /etc/init.d/netdata restart
